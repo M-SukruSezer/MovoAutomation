@@ -132,12 +132,90 @@ daha fazlasını istemeye başlarsa onay bayatlar ve neyin değiştiğini söyle
 altında çalışır — yani eylem, beyan ettiğinin ötesine denemeye kalksa bile
 uzanamaz.
 
-## Hakkında
+## Örnekler
 
-Editörün uygulama menüsünde bir Hakkında girdisi var: sürüm, proje
-bağlantıları ve hata bildirimine ekleyebileceğiniz bir tanı raporu.
+Movo ile gelen dört akış; her biri otomasyonun başka bir biçimini
+gösteriyor. Görseller editörün tuvalinin kendisi.
 
-<img src="docs/hakkinda.png" alt="Movo Automation Hakkında" width="360">
+### Kendi resimlerini hazırlayan klasör
+
+İzlenen klasöre bir dosya düşüyor; küçültülmüş, WebP'ye çevrilmiş ve
+tarihli bir adla yerine konmuş olarak çıkıyor.
+
+![Klasörden WebP'ye](docs/sema/resim-webp.png)
+
+```yaml
+trigger:
+  type: folder
+  path: ~/Resimler/Gelen
+  match: "*.{png,jpg,jpeg}"
+steps:
+  - {id: kucult, action: image.resize,  with: {image: "{{ trigger.file }}", max_width: 1600}}
+  - {id: webp,   action: image.convert, with: {image: "{{ kucult.image }}", format: webp}}
+  - {id: tasi,   action: file.move,     with: {file: "{{ webp.image }}", to_dir: ~/Resimler/Web}}
+```
+
+### Aynı iş, bütün klasör için ve paralel
+
+`for_each` adımı her öge için bir kez çalıştırır ve çıktısını listeye
+dönüştürür. `workers` birkaçını aynı anda işler; sonuçların sırası
+değişmez. `on_error: atla` ise bozuk bir dosyanın ötekileri durdurmasını
+engeller.
+
+![Toplu dönüştürme](docs/sema/toplu-webp.png)
+
+```yaml
+  - id: kucult
+    action: image.resize
+    for_each: "{{ bul.files }}"
+    workers: auto
+    on_error: atla
+    with: {image: "{{ item.value }}", max_width: 1600}
+```
+
+### Sisteme tepki vermek
+
+Bu akış, UPower yeni bir pil yüzdesi bildirdiğinde uyanıyor. %20'nin
+altında güç profilini tasarrufa alıp haber veriyor; %60 ve üstünde dengeye
+geri dönüyor. Kesikli kablolar veri değil, koşul taşıyor.
+
+![Pil tetikleyicisi](docs/sema/pil-dusuk.png)
+
+```yaml
+trigger:
+  type: dbus
+  bus: system
+  interface: org.freedesktop.UPower.Device
+  property: Percentage
+  produces: number
+steps:
+  - id: tasarruf
+    action: guc.profil
+    when: {left: "{{ trigger.value }}", op: "<", right: 20}
+    with: {profile: power-saver}
+```
+
+### Dallanma
+
+Tek bir denetim, üç sonuç — yedek ya yok, ya şüpheli küçük, ya da yerinde.
+Yalnızca biri konuşuyor; çünkü koşulu tutmayan adım atlanıyor, ona bağlı
+olan da atlanıyor.
+
+![Dallanma](docs/sema/yedek-kontrol.png)
+
+```yaml
+  - id: yok
+    action: ui.notify
+    when: {left: "{{ yedek.exists }}", op: yanlış}
+    with: {title: Yedek alınmamış}
+
+  - id: kucuk
+    action: ui.notify
+    when:
+      - {left: "{{ yedek.exists }}", op: doğru}
+      - {left: "{{ yedek.size }}", op: "<", right: 1048576}
+    with: {title: Yedek şüpheli küçük}
+```
 
 ## Kurulum
 

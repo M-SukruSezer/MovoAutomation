@@ -132,12 +132,89 @@ with `isolate: true` the step runs under a kernel-level restriction
 (Landlock), so an action cannot reach past what it declared — even if it
 tries.
 
-## About
+## Examples
 
-The application menu of the editor carries an About entry with the version,
-the project links and a diagnostics report you can attach to a bug report.
+Four flows that ship with Movo, each showing a different shape of
+automation. The pictures are the actual editor canvas.
 
-<img src="docs/hakkinda.png" alt="About Movo Automation" width="360">
+### A folder that prepares its own images
+
+A file lands in a watched folder; it comes out resized, converted to WebP
+and filed away under a dated name.
+
+![Folder to WebP](docs/sema/resim-webp.png)
+
+```yaml
+trigger:
+  type: folder
+  path: ~/Resimler/Gelen
+  match: "*.{png,jpg,jpeg}"
+steps:
+  - {id: kucult, action: image.resize,  with: {image: "{{ trigger.file }}", max_width: 1600}}
+  - {id: webp,   action: image.convert, with: {image: "{{ kucult.image }}", format: webp}}
+  - {id: tasi,   action: file.move,     with: {file: "{{ webp.image }}", to_dir: ~/Resimler/Web}}
+```
+
+### The same work over a whole folder, in parallel
+
+`for_each` runs a step once per item and turns its output into a list.
+`workers` processes several at a time; the order of the results does not
+change. `on_error: atla` means one corrupt file does not stop the rest.
+
+![Batch conversion](docs/sema/toplu-webp.png)
+
+```yaml
+  - id: kucult
+    action: image.resize
+    for_each: "{{ bul.files }}"
+    workers: auto
+    on_error: atla
+    with: {image: "{{ item.value }}", max_width: 1600}
+```
+
+### Reacting to the system
+
+This flow wakes when UPower reports a new battery percentage. Below 20% it
+switches to the power-saver profile and says so; at 60% and above it goes
+back to balanced. The dashed wires are conditions, not data.
+
+![Battery trigger](docs/sema/pil-dusuk.png)
+
+```yaml
+trigger:
+  type: dbus
+  bus: system
+  interface: org.freedesktop.UPower.Device
+  property: Percentage
+  produces: number
+steps:
+  - id: tasarruf
+    action: guc.profil
+    when: {left: "{{ trigger.value }}", op: "<", right: 20}
+    with: {profile: power-saver}
+```
+
+### Branching
+
+One check, three outcomes — the backup is missing, suspiciously small, or
+fine. Exactly one of them speaks, because a step whose condition fails is
+skipped, and so is anything depending on it.
+
+![Branching](docs/sema/yedek-kontrol.png)
+
+```yaml
+  - id: yok
+    action: ui.notify
+    when: {left: "{{ yedek.exists }}", op: yanlış}
+    with: {title: Yedek alınmamış}
+
+  - id: kucuk
+    action: ui.notify
+    when:
+      - {left: "{{ yedek.exists }}", op: doğru}
+      - {left: "{{ yedek.size }}", op: "<", right: 1048576}
+    with: {title: Yedek şüpheli küçük}
+```
 
 ## Installation
 
