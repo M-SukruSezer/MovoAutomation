@@ -134,7 +134,7 @@ tries.
 
 ## Examples
 
-Four flows that ship with Movo, each showing a different shape of
+Five flows that ship with Movo, each showing a different shape of
 automation. The pictures are the actual editor canvas.
 
 ### A folder that prepares its own images
@@ -214,6 +214,30 @@ skipped, and so is anything depending on it.
       - {left: "{{ yedek.exists }}", op: doğru}
       - {left: "{{ yedek.size }}", op: "<", right: 1048576}
     with: {title: Yedek şüpheli küçük}
+```
+
+### Recovering from an error
+
+Both stages of this backup can fail. `on_error: devam` turns a failure into
+a port: the step gains `tamam` (did it work?) and `hata` (what went wrong),
+and the flow carries on. Each stage has its own handler.
+
+Only the stage that actually broke reports it — if archiving fails, sending
+is skipped, and so is *its* handler, because that one depends on a step
+that never ran.
+
+![Error branch](docs/sema/yedek-gonder.png)
+
+```yaml
+  - id: gonder
+    action: shell.run
+    on_error: devam
+    with: {command: "rsync -a {{ arsiv.stdout }} sunucu:/arsiv/", check: true}
+
+  - id: gonder-hata
+    action: ui.notify
+    when: {left: "{{ gonder.tamam }}", op: yanlış}
+    with: {title: Yedek gönderilemedi, body: "{{ gonder.hata }}"}
 ```
 
 ## Installation

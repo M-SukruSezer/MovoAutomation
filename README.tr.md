@@ -134,7 +134,7 @@ uzanamaz.
 
 ## Örnekler
 
-Movo ile gelen dört akış; her biri otomasyonun başka bir biçimini
+Movo ile gelen beş akış; her biri otomasyonun başka bir biçimini
 gösteriyor. Görseller editörün tuvalinin kendisi.
 
 ### Kendi resimlerini hazırlayan klasör
@@ -215,6 +215,30 @@ olan da atlanıyor.
       - {left: "{{ yedek.exists }}", op: doğru}
       - {left: "{{ yedek.size }}", op: "<", right: 1048576}
     with: {title: Yedek şüpheli küçük}
+```
+
+### Hatadan dönmek
+
+Bu yedeğin iki aşaması da patlayabilir. `on_error: devam` hatayı porta
+çeviriyor: adım `tamam` (oldu mu?) ve `hata` (ne oldu?) çıktılarını
+kazanıyor, akış da sürüyor. Her aşamanın kendi karşılama adımı var.
+
+Yalnızca gerçekten kırılan aşama haber veriyor — arşivleme patlarsa
+gönderme atlanıyor, onun karşılama adımı da atlanıyor; çünkü o adım hiç
+çalışmamış bir adıma dayanıyor.
+
+![Hata dalı](docs/sema/yedek-gonder.png)
+
+```yaml
+  - id: gonder
+    action: shell.run
+    on_error: devam
+    with: {command: "rsync -a {{ arsiv.stdout }} sunucu:/arsiv/", check: true}
+
+  - id: gonder-hata
+    action: ui.notify
+    when: {left: "{{ gonder.tamam }}", op: yanlış}
+    with: {title: Yedek gönderilemedi, body: "{{ gonder.hata }}"}
 ```
 
 ## Kurulum
