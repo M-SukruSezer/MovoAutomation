@@ -1,0 +1,36 @@
+# İkinci örneğin: "ev Wi-Fi'ına bağlanınca VPN'i kapat, parlaklığı %70 yap".
+# Ağ tetikleyicisi NetworkManager dispatcher'ı kullandığı için kurulumu root
+# ister; 'movo kur' script'i hazırlar, kurma komutunu sana bırakır.
+name: Ev ağına bağlanınca
+description: Ev Wi-Fi'ında VPN'i kapatır, parlaklığı %70'e indirir, güç profilini dengeye alır.
+slug: ev-wifi
+
+trigger:
+  type: network
+  connection: Ev
+  state: up
+
+steps:
+  - id: vpn
+    action: net.connection
+    with:
+      name: is-vpn
+      state: down
+
+  - id: parlaklik
+    action: display.brightness
+    with:
+      percent: 70
+
+  # Güç profili D-Bus eylemi: sistem bus'ında bir özellik yazımı.
+  - id: guc
+    action: guc.profil
+    with:
+      profile: balanced
+
+  - id: bildir
+    action: ui.notify
+    with:
+      title: Ev ağı
+      body: "VPN kapatıldı ({{ vpn.message }}), parlaklık %{{ parlaklik.percent }}, profil {{ guc.profile }}"
+      urgency: low

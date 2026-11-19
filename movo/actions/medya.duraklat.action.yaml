@@ -1,0 +1,21 @@
+# Servis adı çalışma anında kuruluyor: izin sabit bir ad değil, desen.
+# Denetim manifest yüklenirken değil, çağrı yapılırken yapılır.
+id: medya.duraklat
+name: Oynatmayı aç/kapat
+summary: MPRIS üzerinden oynatıcıyı duraklatır ya da devam ettirir.
+category: medya
+permissions: ["dbus:org.mpris.MediaPlayer2.*"]
+tags: [medya, mpris, dbus]
+inputs:
+  player:
+    type: text
+    label: Oynatıcı
+    required: true
+    default: vlc
+impl:
+  kind: dbus
+  bus: session
+  service: {input: player, prefix: "org.mpris.MediaPlayer2."}
+  object: /org/mpris/MediaPlayer2
+  interface: org.mpris.MediaPlayer2.Player
+  member: PlayPause

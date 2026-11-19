@@ -1,0 +1,28 @@
+# Sistem bus'ında bir özellik yazımı: power-profiles-daemon polkit ile
+# korunuyor, yetki yoksa hata 'yetki reddedildi (polkit)' diye döner.
+id: guc.profil
+name: Güç profilini ayarla
+summary: power-profiles-daemon üzerinden performans/dengeli/tasarruf moduna geçer.
+category: sistem
+permissions: [dbus:net.hadess.PowerProfiles]
+tags: [güç, batarya, dbus]
+inputs:
+  profile:
+    type: text
+    label: Profil
+    required: true
+    choices: [power-saver, balanced, performance]
+outputs:
+  profile: {type: text, label: Uygulanan profil}
+impl:
+  kind: dbus
+  bus: system
+  service: net.hadess.PowerProfiles
+  object: /net/hadess/PowerProfiles
+  interface: net.hadess.PowerProfiles
+  property: ActiveProfile
+  access: set
+  value: {input: profile}
+  value_type: "s"
+  returns:
+    profile: {index: 0}

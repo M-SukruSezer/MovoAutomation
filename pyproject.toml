@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "movo"
+description = "Linux için görsel otomasyon motoru: eylem sözlüğü, tip sistemi, düğüm editörü"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = ["automation", "workflow", "linux", "dbus", "gtk", "systemd"]
+dynamic = ["version"]
+
+# Çekirdek yalnızca PyYAML istiyor: akış yüklemek, doğrulamak, dosya ve
+# metin eylemlerini çalıştırmak için başka bir şey gerekmiyor. Resim ve
+# masaüstü yetenekleri isteğe bağlı -- eksikse motor çalışmaya devam
+# eder, yalnızca o eylemler hata verir.
+dependencies = ["PyYAML>=5.1"]
+
+[project.optional-dependencies]
+resim = ["Pillow>=9"]
+# PyGObject'i pip ile kurmak gobject-introspection ve cairo başlıkları
+# ister; Linux'ta doğru yol dağıtımın paketidir (python3-gi,
+# gir1.2-gtk-4.0, gir1.2-adw-1). Bu ekstra, sanal ortamı
+# --system-site-packages ile kuramayanlar için duruyor.
+masaustu = ["PyGObject>=3.42"]
+hepsi = ["Pillow>=9", "PyGObject>=3.42"]
+
+[project.scripts]
+movo = "movo.cli:main"
+
+[project.urls]
+Anasayfa = "https://github.com/M-SukruSezer/movo"
+Kaynak = "https://github.com/M-SukruSezer/movo"
+Hatalar = "https://github.com/M-SukruSezer/movo/issues"
+
+[tool.setuptools]
+# Eylem manifestleri ve örnek akışlar koda eşlik eder: manifest
+# standardının anlamı, bir paketin kendi eylemlerini yanında
+# getirebilmesi. İlk getiren bu paketin kendisi.
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["movo*"]
+
+[tool.setuptools.package-data]
+movo = ["actions/*.action.yaml", "ornekler/*.yaml", "veri/*",
+        "veri/icons/hicolor/*/apps/*.svg"]
+
+[tool.setuptools.dynamic]
+version = { attr = "movo.__version__" }

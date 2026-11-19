@@ -1,0 +1,20 @@
+id: medya.durum
+name: Oynatma durumu
+summary: Oynatıcının Playing / Paused / Stopped durumunu okur.
+category: medya
+permissions: ["dbus:org.mpris.MediaPlayer2.*"]
+tags: [medya, mpris, dbus]
+inputs:
+  player: {type: text, label: Oynatıcı, required: true, default: vlc}
+outputs:
+  state: {type: text, label: Durum}
+impl:
+  kind: dbus
+  bus: session
+  service: {input: player, prefix: "org.mpris.MediaPlayer2."}
+  object: /org/mpris/MediaPlayer2
+  interface: org.mpris.MediaPlayer2.Player
+  property: PlaybackStatus
+  access: get
+  returns:
+    state: {index: 0}

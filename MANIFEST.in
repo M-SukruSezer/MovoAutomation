@@ -1,0 +1,7 @@
+include LICENSE README.md
+recursive-include movo/actions *.action.yaml
+recursive-include movo/ornekler *.yaml
+recursive-include movo/veri *
+recursive-include tests *.sh *.py *.yaml
+recursive-include tools *.py
+recursive-include docs *.png

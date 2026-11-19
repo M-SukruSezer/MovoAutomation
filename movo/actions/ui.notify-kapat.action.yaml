@@ -1,0 +1,18 @@
+id: ui.notify-kapat
+name: Bildirimi kapat
+summary: Daha önce gösterilmiş bir bildirimi kimliğinden kapatır.
+category: masaüstü
+permissions: [dbus:org.freedesktop.Notifications]
+tags: [bildirim, dbus]
+inputs:
+  id: {type: number, label: Bildirim kimliği, required: true}
+impl:
+  kind: dbus
+  bus: session
+  service: org.freedesktop.Notifications
+  object: /org/freedesktop/Notifications
+  interface: org.freedesktop.Notifications
+  member: CloseNotification
+  signature: "(u)"
+  args:
+    - {input: id}

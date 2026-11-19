@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128"
+     viewBox="0 0 128 128">
+  <title>Movo Automation</title>
+  <!--
+    <svg> dosyanın ilk baytlarında kalmalı. gdk-pixbuf bir görüntüyü açılış
+    baytlarına bakarak tanır; öğenin üstüne uzun bir yorum konursa <svg> o
+    pencereden taşar, yükleyici "biçim tanınamadı" der ve masaüstünde hiç
+    simge görünmez — GTK'nın kendi simge teması dosyayı sorunsuz çözse bile.
+    Açıklama bu yüzden burada duruyor.
+
+    Fikir: iki düğüm ve aralarındaki kablo. Uygulamanın tamamı bu —
+    bloklar ve onları birbirine bağlayan tipli bağlantılar. Alttaki düğüm
+    kaynağı, üstteki hedefi; kablo aşağıdan yukarı akıyor.
+
+    Adwaita kalıbı: 128x128, GNOME paleti, düz yüzeyler ve kalınlık için
+    bir alt katman kaydırması.
+  -->
+
+  <g transform="translate(64 64) scale(0.98) translate(-64 -64)">
+
+    <!-- kablo: düğümlerin arasından geçen S; önce koyu taban, üstüne akış -->
+    <path d="M 58 96 C 96 96, 32 32, 70 32"
+          fill="none" stroke="#1a5fb4" stroke-width="17" stroke-linecap="round"/>
+    <path d="M 58 96 C 96 96, 32 32, 70 32"
+          fill="none" stroke="#2ec27e" stroke-width="11" stroke-linecap="round"/>
+
+    <!-- kaynak düğüm (alt sol) -->
+    <g>
+      <rect x="5" y="76" width="54" height="46" rx="14" fill="#1a5fb4"/>
+      <rect x="5" y="70" width="54" height="46" rx="14" fill="#3584e4"/>
+      <rect x="15" y="80" width="30" height="7" rx="3.5" fill="#99c1f1"/>
+      <rect x="15" y="94" width="19" height="7" rx="3.5" fill="#99c1f1"/>
+    </g>
+
+    <!-- hedef düğüm (üst sağ) -->
+    <g>
+      <rect x="69" y="18" width="54" height="46" rx="14" fill="#1a5fb4"/>
+      <rect x="69" y="12" width="54" height="46" rx="14" fill="#3584e4"/>
+      <rect x="79" y="22" width="30" height="7" rx="3.5" fill="#99c1f1"/>
+      <rect x="79" y="36" width="19" height="7" rx="3.5" fill="#99c1f1"/>
+    </g>
+
+    <!-- portlar: kablonun düğümlere değdiği yer -->
+    <circle cx="58" cy="96" r="11" fill="#1a5fb4"/>
+    <circle cx="58" cy="96" r="7" fill="#8ff0a4"/>
+    <circle cx="70" cy="32" r="11" fill="#1a5fb4"/>
+    <circle cx="70" cy="32" r="7" fill="#8ff0a4"/>
+
+  </g>
+</svg>

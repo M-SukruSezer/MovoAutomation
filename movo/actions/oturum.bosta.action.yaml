@@ -1,0 +1,20 @@
+# ScreenSaver.GetSessionIdleTime GNOME'da artık NotSupported döndürüyor;
+# gerçek kaynak Mutter'ın boşta izleyicisi. Masaüstüne özgü bir eylem
+# olduğunu adında değil, özetinde ve izninde görüyorsun.
+id: oturum.bosta
+name: Boşta geçen süre (GNOME)
+summary: Mutter'ın boşta izleyicisinden kullanıcının kaç saniyedir dokunmadığını okur.
+category: masaüstü
+permissions: [dbus:org.gnome.Mutter.IdleMonitor]
+tags: [oturum, dbus]
+outputs:
+  seconds: {type: number, label: Boşta saniye}
+impl:
+  kind: dbus
+  bus: session
+  service: org.gnome.Mutter.IdleMonitor
+  object: /org/gnome/Mutter/IdleMonitor/Core
+  interface: org.gnome.Mutter.IdleMonitor
+  member: GetIdletime
+  returns:
+    seconds: {index: 0, scale: 0.001}   # milisaniye → saniye

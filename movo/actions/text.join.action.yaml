@@ -1,0 +1,17 @@
+id: text.join
+name: Listeyi metne çevir
+summary: Liste ögelerini birleştirir; döngü sonucunu bildirimde göstermek için.
+category: metin
+permissions: []
+tags: [liste, metin]
+inputs:
+  parts: {type: list<text>, label: Parçalar, required: true}
+  separator: {type: text, label: Ayırıcı, default: ", "}
+  limit: {type: number, label: En fazla kaç öge (0 = hepsi), default: 0}
+  more: {type: text, label: Kalanlar için, default: "ve {n} tane daha"}
+outputs:
+  text: {type: text, label: Metin}
+  count: {type: number, label: Öge sayısı}
+impl:
+  kind: python
+  entry: movo.actions.builtin:text_join

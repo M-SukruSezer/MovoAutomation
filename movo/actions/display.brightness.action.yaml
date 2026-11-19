@@ -1,0 +1,12 @@
+id: display.brightness
+name: Ekran parlaklığını ayarla
+summary: Parlaklığı yüzde olarak ayarlar (brightnessctl veya sysfs).
+category: masaüstü
+permissions: [display]
+inputs:
+  percent: {type: number, label: Yüzde, required: true}
+outputs:
+  percent: {type: number, label: Uygulanan yüzde}
+impl:
+  kind: python
+  entry: movo.actions.builtin:display_brightness

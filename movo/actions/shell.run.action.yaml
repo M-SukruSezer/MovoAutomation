@@ -1,0 +1,19 @@
+id: shell.run
+name: Komut çalıştır
+summary: "Kaçış kapısı: motorun kapsamadığı her şey. İzin uyarısıyla gösterilir."
+category: uzman
+permissions: [exec]
+tags: [uzman]
+inputs:
+  command: {type: text, label: Komut, required: true}
+  workdir: {type: directory, label: Çalışma klasörü, default: ""}
+  timeout: {type: number, label: Zaman aşımı (sn), default: 60}
+  # Varsayılan kapalı: çıkış kodu bir port, hata değil. Açıkken sıfır
+  # olmayan çıkış adımı düşürür, yani on_error ile yakalanabilir olur.
+  check: {type: bool, label: Sıfır olmayan çıkışta hata ver, default: false}
+outputs:
+  stdout: {type: text, label: Çıktı}
+  exit_code: {type: number, label: Çıkış kodu}
+impl:
+  kind: python
+  entry: movo.actions.builtin:shell_run

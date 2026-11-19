@@ -1,0 +1,15 @@
+# org.freedesktop.ScreenSaver masaüstünden bağımsız standarttır; GNOME de
+# KDE de bu adı sağlar.
+id: oturum.kilitle
+name: Ekranı kilitle
+summary: Ekran koruyucuyu devreye alıp oturumu kilitler.
+category: masaüstü
+permissions: [dbus:org.freedesktop.ScreenSaver]
+tags: [oturum, kilit, dbus]
+impl:
+  kind: dbus
+  bus: session
+  service: org.freedesktop.ScreenSaver
+  object: /org/freedesktop/ScreenSaver
+  interface: org.freedesktop.ScreenSaver
+  member: Lock

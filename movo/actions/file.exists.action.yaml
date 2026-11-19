@@ -1,0 +1,15 @@
+id: file.exists
+name: Dosya var mı
+summary: Yolun var olup olmadığını ve boyutunu söyler; koşullarda kullanılır.
+category: dosya
+permissions: [fs.read]
+tags: [koşul, dosya]
+inputs:
+  path: {type: path, label: Yol, required: true}
+outputs:
+  exists: {type: bool, label: Var mı}
+  size: {type: number, label: Boyut (bayt)}
+  path: {type: path, label: Yol}
+impl:
+  kind: python
+  entry: movo.actions.builtin:file_exists

@@ -1,0 +1,19 @@
+id: file.move
+name: Dosyayı taşı
+summary: "Dosyayı hedef klasöre taşır. Ad deseni alanları: {name} {ext} {date} {time} {stamp} {parent}"
+category: dosya
+permissions: [fs.read, fs.write]
+inputs:
+  file: {type: file, label: Dosya, required: true}
+  to_dir: {type: directory, label: Hedef klasör, required: true}
+  pattern:
+    type: text
+    label: Ad deseni
+    default: "{name}.{ext}"
+  overwrite: {type: bool, label: Üzerine yaz, default: false}
+outputs:
+  file: {type: file, label: Yeni yol}
+  directory: {type: directory, label: Klasör}
+impl:
+  kind: python
+  entry: movo.actions.builtin:file_move

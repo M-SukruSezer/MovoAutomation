@@ -1,0 +1,23 @@
+# Kasıtlı olarak bozuk akış: 'movo kontrol tests/bozuk.yaml' ile doğrulayıcının
+# ne yakaladığını görmek için. Beş ayrı hata içerir.
+name: Bozuk örnek
+trigger:
+  type: folder
+  path: /tmp
+steps:
+  - id: kucult
+    action: image.resize
+    with:
+      image: "{{ trigger.filename }}"   # metin -> resim portu
+      max_width: çok                    # sayı değil
+  - id: tasi
+    action: file.move
+    with:
+      file: "{{ kucult.resim }}"        # öyle bir çıktı yok
+      to_dir: /tmp
+      mode: üzerine                     # öyle bir girdi yok
+  - id: cevir
+    action: image.convert
+    with:
+      image: "{{ kucult.image }}"
+      format: gif                       # seçenekler arasında değil

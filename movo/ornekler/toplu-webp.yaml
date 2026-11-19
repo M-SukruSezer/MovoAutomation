@@ -1,0 +1,70 @@
+# resim-webp.yaml'ın toplu hâli: orada tetikleyici tek dosya getiriyordu,
+# burada klasörün tamamı bir liste oluyor ve üç adım listenin her ögesi
+# için çalışıyor. Aynı eylemler, aynı portlar -- tek fark for_each.
+name: Klasörü toplu WebP'ye çevir
+description: Gelen klasöründeki bütün resimleri küçültüp WebP olarak Web klasörüne taşır.
+slug: toplu-webp
+
+# Her adım çekirdek düzeyinde kısıtlanır: beyan ettiği yolların dışına
+# yazamaz, hiçbir şey çalıştıramaz, ağa çıkamaz. Bir resim eyleminin
+# ~/.ssh'e dokunamaması için eylemin dürüst olmasına güvenmek gerekmiyor.
+isolate: true
+
+trigger:
+  type: manual
+
+steps:
+  # produces: image hem çıktının tipini daraltır (list<file> → list<image>)
+  # hem de uzantısı resim olmayanları listeye hiç almaz.
+  - id: bul
+    action: file.glob
+    with:
+      dir: ~/Resimler/Gelen
+      pattern: "*"
+      produces: image
+      sort: time
+
+  # on_error: atla — bozuk tek bir dosya 200 resimlik işi durdurmasın.
+  - id: kucult
+    action: image.resize
+    for_each: "{{ bul.files }}"
+    on_error: atla
+    workers: auto          # resim işleme paralelleşir; sıra yine korunur
+    with:
+      image: "{{ item.value }}"
+      max_width: 1600
+
+  - id: webp
+    action: image.convert
+    for_each: "{{ kucult.image }}"
+    on_error: atla
+    workers: auto
+    with:
+      image: "{{ item.value }}"
+      format: webp
+      quality: 82
+
+  - id: tasi
+    action: file.move
+    for_each: "{{ webp.image }}"
+    with:
+      file: "{{ item.value }}"
+      to_dir: ~/Resimler/Web
+      pattern: "{date}-{name}-web.{ext}"
+
+  - id: ozet
+    action: text.join
+    with:
+      parts: "{{ tasi.file }}"
+      separator: ", "
+      limit: 3
+
+  # Boş klasör için bildirim çıkmasın.
+  - id: bildir
+    action: ui.notify
+    when: {left: "{{ ozet.count }}", op: ">", right: 0}
+    with:
+      title: "{{ ozet.count }} resim hazırlandı"
+      body: "{{ ozet.text }}"
+      urgency: low
+      icon: emblem-ok

@@ -1,0 +1,16 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Movo Automation
+GenericName=Otomasyon akışı editörü
+GenericName[en]=Automation flow editor
+Comment=Dosya işlemlerini ve sistem olaylarını görsel akışlarla otomatikleştirin
+Comment[en]=Automate file operations and system events with visual flows
+Exec=movo duzenle %f
+Icon=io.github.movo.MovoAutomation
+Terminal=false
+Categories=Utility;System;
+Keywords=otomasyon;akış;workflow;automation;dbus;systemd;
+Keywords[en]=automation;workflow;flow;dbus;systemd;
+StartupNotify=true
+StartupWMClass=io.github.movo.MovoAutomation

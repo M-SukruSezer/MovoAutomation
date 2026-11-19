@@ -1,0 +1,26 @@
+# Baştan sona D-Bus: hiçbir adımda alt süreç yok, hiçbir adımda Python
+# gövdesi yok. Üç eylem de manifestindeki adresi çağırıyor; sayı ve metin
+# portları birbirine bağlanıyor.
+name: Pil durumu bildirimi
+description: Batarya yüzdesini ve etkin güç profilini okuyup bildirim olarak gösterir.
+slug: pil-durumu
+
+trigger:
+  type: schedule
+  on_calendar: "*:0/30"
+  persistent: false
+
+steps:
+  - id: pil
+    action: guc.batarya
+
+  - id: profil
+    action: guc.profil-oku
+
+  - id: bildir
+    action: ui.notify
+    with:
+      title: "Pil %{{ pil.percent }}"
+      body: "Güç profili: {{ profil.profile }}"
+      urgency: low
+      icon: battery

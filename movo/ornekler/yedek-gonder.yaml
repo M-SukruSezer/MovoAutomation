@@ -1,0 +1,63 @@
+# Hata dalı örneği. İki aşama da patlayabilir; her birinin kendi
+# haberi var ve yalnızca gerçekten patlayan konuşur.
+#
+# İnce nokta: 'arsiv' patlarsa 'gonder' atlanır (çıktısına dayanıyor),
+# atlanınca da 'gonder-hata' atlanır (onun 'tamam' portuna dayanıyor).
+# Yani iki aşamalı bir çökmede tek bildirim gelir -- gerçekten kırılan
+# yerden. Bunun için ayrı bir kural yazmak gerekmedi, atlama zinciri
+# kendiliğinden böyle davranıyor.
+name: Gecelik yedeği gönder
+description: Belgeleri arşivler, uzak makineye gönderir; her aşamanın hatasını ayrı bildirir.
+slug: yedek-gonder
+
+trigger:
+  type: schedule
+  on_calendar: "*-*-* 02:30:00"
+  persistent: true
+
+steps:
+  - id: arsiv
+    action: shell.run
+    on_error: devam        # patlarsa akış ölmesin, hata porta dönsün
+    with:
+      command: >-
+        mkdir -p ~/Yedek &&
+        tar -I 'zstd -3' -cf ~/Yedek/belgeler.tar.zst -C ~ Belgeler &&
+        echo ~/Yedek/belgeler.tar.zst
+      check: true          # sıfır olmayan çıkış = hata
+      timeout: 900
+
+  - id: gonder
+    action: shell.run
+    on_error: devam
+    with:
+      command: "rsync -a --timeout=120 {{ arsiv.stdout }} yedek@ev-sunucu:/arsiv/"
+      check: true
+      timeout: 1800
+
+  - id: arsiv-hata
+    action: ui.notify
+    when: {left: "{{ arsiv.tamam }}", op: yanlış}
+    with:
+      title: Yedek alınamadı
+      body: "Arşivleme patladı — {{ arsiv.hata }}"
+      urgency: critical
+      icon: dialog-error
+
+  - id: gonder-hata
+    action: ui.notify
+    when: {left: "{{ gonder.tamam }}", op: yanlış}
+    with:
+      title: Yedek gönderilemedi
+      body: "Arşiv yerinde ama aktarım patladı — {{ gonder.hata }}"
+      urgency: critical
+      icon: network-error
+
+  - id: bitti
+    action: ui.notify
+    when: {left: "{{ gonder.tamam }}", op: doğru}
+    with:
+      title: Yedek tamam
+      body: "{{ arsiv.stdout }} gönderildi"
+      urgency: low
+      icon: emblem-ok

@@ -1,0 +1,17 @@
+id: text.split
+name: Metni parçala
+summary: Metni ayırıcıya göre listeye böler (shell.run çıktısını listeye çevirmek için).
+category: metin
+permissions: []
+tags: [liste, döngü, metin]
+inputs:
+  text: {type: text, label: Metin, required: true}
+  separator: {type: text, label: Ayırıcı, default: "\n"}
+  trim: {type: bool, label: Boşlukları kırp, default: true}
+  drop_empty: {type: bool, label: Boşları at, default: true}
+outputs:
+  parts: {type: list<text>, label: Parçalar}
+  count: {type: number, label: Adet}
+impl:
+  kind: python
+  entry: movo.actions.builtin:text_split

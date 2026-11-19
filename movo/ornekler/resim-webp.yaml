@@ -1,0 +1,40 @@
+# Senin örneğin: "bir klasöre resim atıldığında boyutunu küçült, WebP'ye
+# çevir ve adını değiştir". Dosyayı düzenle, 'movo kontrol' ile doğrula.
+name: Gelen resimleri web için hazırla
+description: Klasöre atılan resmi 1600 px'e küçültür, WebP yapar, arşive taşır.
+slug: resim-webp
+
+trigger:
+  type: folder
+  path: ~/Resimler/Gelen
+  match: "*.{png,jpg,jpeg,tif,tiff,bmp}"
+  events: created,moved_in
+  settle_ms: 300
+  produces: image      # bu klasörde resim var; motor çalışma anında doğrular
+
+steps:
+  - id: kucult
+    action: image.resize
+    with:
+      image: "{{ trigger.file }}"
+      max_width: 1600
+
+  - id: webp
+    action: image.convert
+    with:
+      image: "{{ kucult.image }}"
+      format: webp
+      quality: 82
+
+  - id: tasi
+    action: file.move
+    with:
+      file: "{{ webp.image }}"
+      to_dir: ~/Resimler/Web
+      pattern: "{date}-{name}-web.{ext}"
+
+  - id: bildir
+    action: ui.notify
+    with:
+      title: Resim hazır
+      body: "{{ tasi.file }} ({{ kucult.width }}x{{ kucult.height }})"

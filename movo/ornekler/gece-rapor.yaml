@@ -1,0 +1,23 @@
+# Zamanlanmış akış: systemd timer'ına derlenir.
+# shell.run kasıtlı kaçış kapısıdır; motorun kapsamadığı her şey oradan geçer.
+name: Gecelik disk raporu
+description: Her gece 03:00'te İndirilenler klasörünün boyutunu bildirir.
+slug: gece-rapor
+
+trigger:
+  type: schedule
+  on_calendar: "*-*-* 03:00:00"
+  persistent: true
+
+steps:
+  - id: olc
+    action: shell.run
+    with:
+      command: du -sh ~/İndirilenler 2>/dev/null | cut -f1
+
+  - id: bildir
+    action: ui.notify
+    with:
+      title: Gecelik rapor
+      body: "İndirilenler klasörü {{ olc.stdout }} yer kaplıyor"
+      urgency: low

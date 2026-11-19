@@ -1,0 +1,49 @@
+# Dallanma örneği. 'else' diye bir düğüm yok: karşıt dal, karşıt koşulu
+# yazarak kuruluyor. Üç adım da aynı 'yedek' adımının çıktılarına bakıyor,
+# ama yalnızca biri çalışıyor.
+name: Yedek kontrolü
+description: Günlük yedek dosyası yerinde mi, boyutu makul mü diye bakar.
+slug: yedek-kontrol
+
+trigger:
+  type: schedule
+  on_calendar: "*-*-* 09:00:00"
+  persistent: true
+
+steps:
+  - id: yedek
+    action: file.exists
+    with:
+      path: ~/Yedek/gunluk.tar.zst
+
+  - id: yok
+    action: ui.notify
+    when: {left: "{{ yedek.exists }}", op: yanlış}
+    with:
+      title: Yedek alınmamış
+      body: "{{ yedek.path }} bulunamadı"
+      urgency: critical
+      icon: dialog-warning
+
+  # İki koşul yan yana yazılınca ikisi birden aranır.
+  - id: kucuk
+    action: ui.notify
+    when:
+      - {left: "{{ yedek.exists }}", op: doğru}
+      - {left: "{{ yedek.size }}", op: "<", right: 1048576}
+    with:
+      title: Yedek şüpheli küçük
+      body: "{{ yedek.size }} bayt — beklenen en az 1 MB"
+      urgency: critical
+      icon: dialog-warning
+
+  - id: iyi
+    action: ui.notify
+    when:
+      - {left: "{{ yedek.exists }}", op: doğru}
+      - {left: "{{ yedek.size }}", op: ">=", right: 1048576}
+    with:
+      title: Yedek yerinde
+      body: "{{ yedek.size }} bayt"
+      urgency: low
+      icon: emblem-ok

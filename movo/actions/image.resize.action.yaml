@@ -1,0 +1,30 @@
+id: image.resize
+name: Resmi yeniden boyutlandır
+summary: Oranı koruyarak en/boy sınırına sığdırır. Varsayılan olarak büyütmez.
+category: resim
+permissions: [fs.read, fs.write]
+tags: [resim, boyut]
+inputs:
+  image:
+    type: image
+    label: Resim
+    required: true
+  max_width:
+    type: number
+    label: En fazla genişlik (px)
+    default: 1600
+  max_height:
+    type: number
+    label: En fazla yükseklik (px)
+    default: 0
+  allow_upscale:
+    type: bool
+    label: Küçük resmi büyüt
+    default: false
+outputs:
+  image: {type: image, label: Sonuç}
+  width: {type: number, label: Genişlik}
+  height: {type: number, label: Yükseklik}
+impl:
+  kind: python
+  entry: movo.actions.builtin:image_resize

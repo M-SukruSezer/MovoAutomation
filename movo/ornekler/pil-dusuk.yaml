@@ -1,0 +1,42 @@
+# İki turdur "yazılamıyor" dediğim akış. pil-durumu.yaml 30 dakikada bir
+# sorup bakıyordu; bu, UPower değeri değiştirdiği anda uyanıyor.
+#
+# Tekrar eden koşul yok: 'uyar' adımı 'tasarruf'un çıktısına dayandığı
+# için, o atlandığında kendisi de atlanıyor. Dallanmanın zincirlenmesi
+# 'else' eksikliğinin pratikteki cevabı.
+name: Pil azalınca tasarrufa geç
+description: Batarya %20'nin altına düşünce güç profilini tasarrufa alır ve haber verir.
+slug: pil-dusuk
+
+trigger:
+  type: dbus
+  bus: system
+  service: org.freedesktop.UPower
+  object: /org/freedesktop/UPower/devices/DisplayDevice
+  interface: org.freedesktop.UPower.Device
+  property: Percentage
+  produces: number
+  settle_ms: 2000        # yüzde hızlı hızlı değişirse tek olaya indir
+
+steps:
+  - id: tasarruf
+    action: guc.profil
+    when: {left: "{{ trigger.value }}", op: "<", right: 20}
+    with:
+      profile: power-saver
+
+  - id: uyar
+    action: ui.notify
+    with:
+      title: "Pil %{{ trigger.value }}"
+      body: "Güç profili {{ tasarruf.profile }} yapıldı"
+      urgency: critical
+      icon: battery-caution
+
+  # Fişe takılıp dolunca geri dön. Bu adım 'tasarruf'a dayanmıyor,
+  # kendi koşulu var.
+  - id: normal
+    action: guc.profil
+    when: {left: "{{ trigger.value }}", op: ">=", right: 60}
+    with:
+      profile: balanced

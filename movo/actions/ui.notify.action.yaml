@@ -1,0 +1,36 @@
+# Eskiden notify-send'i alt süreç olarak çağırıyordu; artık bildirim
+# sunucusuyla doğrudan konuşuyor. Kazanç: 'exec' izni gitti, dönen bildirim
+# kimliği bir port oldu (bkz. ui.notify-kapat).
+id: ui.notify
+name: Bildirim göster
+summary: Masaüstü bildirim sunucusuna doğrudan bildirim gönderir.
+category: masaüstü
+permissions: [dbus:org.freedesktop.Notifications]
+tags: [bildirim, dbus]
+inputs:
+  title: {type: text, label: Başlık, required: true}
+  body: {type: text, label: Metin, default: ""}
+  urgency: {type: text, label: Önem, default: normal, choices: [low, normal, critical]}
+  icon: {type: text, label: Simge adı, default: system-run}
+outputs:
+  id: {type: number, label: Bildirim kimliği}
+impl:
+  kind: dbus
+  bus: session
+  service: org.freedesktop.Notifications
+  object: /org/freedesktop/Notifications
+  interface: org.freedesktop.Notifications
+  member: Notify
+  signature: "(susssasa{sv}i)"
+  args:
+    - {const: Akış}            # app_name
+    - {const: 0}               # replaces_id
+    - {input: icon}            # app_icon
+    - {input: title}           # summary
+    - {input: body}            # body
+    - {const: []}              # actions
+    - dict:                    # hints
+        urgency: {input: urgency, type: "y", map: {low: 0, normal: 1, critical: 2}}
+    - {const: -1}              # expire_timeout: sunucu karar verir
+  returns:
+    id: {index: 0}

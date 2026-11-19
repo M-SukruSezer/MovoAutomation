@@ -1,0 +1,26 @@
+# display.brightness'ın D-Bus karşılığı. Daha az yan etki (sysfs'e yazmaz,
+# brightnessctl istemez) ama daha az taşınabilir: gnome-settings-daemon
+# gerektirir ve yalnızca arka ışığı olan panellerde çalışır. KDE'deki
+# karşılığını 'movo incele org.kde.Solid.PowerManagement' bulur.
+id: ekran.parlaklik-dbus
+name: Parlaklık (GNOME)
+summary: gnome-settings-daemon üzerinden ekran parlaklığını yüzde olarak ayarlar.
+category: masaüstü
+permissions: [dbus:org.gnome.SettingsDaemon.Power]
+tags: [ekran, dbus]
+inputs:
+  percent: {type: number, label: Yüzde, required: true}
+outputs:
+  percent: {type: number, label: Uygulanan yüzde}
+impl:
+  kind: dbus
+  bus: session
+  service: org.gnome.SettingsDaemon.Power
+  object: /org/gnome/SettingsDaemon/Power
+  interface: org.gnome.SettingsDaemon.Power.Screen
+  property: Brightness
+  access: set
+  value: {input: percent}
+  value_type: "i"
+  returns:
+    percent: {index: 0}

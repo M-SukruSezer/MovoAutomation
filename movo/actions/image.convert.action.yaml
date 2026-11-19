@@ -1,0 +1,30 @@
+id: image.convert
+name: Resim biçimini çevir
+summary: WebP, JPEG, PNG veya AVIF olarak yeniden kodlar.
+category: resim
+permissions: [fs.read, fs.write]
+tags: [resim, webp, sıkıştırma]
+inputs:
+  image:
+    type: image
+    label: Resim
+    required: true
+  format:
+    type: text
+    label: Biçim
+    default: webp
+    choices: [webp, jpeg, png, avif]
+  quality:
+    type: number
+    label: Kalite (1-100)
+    default: 82
+  strip_metadata:
+    type: bool
+    label: EXIF verisini at
+    default: true
+outputs:
+  image: {type: image, label: Sonuç}
+  size: {type: number, label: Bayt}
+impl:
+  kind: python
+  entry: movo.actions.builtin:image_convert

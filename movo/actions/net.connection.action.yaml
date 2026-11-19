@@ -1,0 +1,14 @@
+id: net.connection
+name: Ağ bağlantısını aç/kapat
+summary: NetworkManager bağlantısını (VPN dahil) adıyla açar veya kapatır.
+category: ağ
+permissions: [net, exec]
+inputs:
+  name: {type: text, label: Bağlantı adı, required: true}
+  state: {type: text, label: Durum, default: down, choices: [up, down]}
+outputs:
+  ok: {type: bool, label: Başarılı}
+  message: {type: text, label: Çıktı}
+impl:
+  kind: python
+  entry: movo.actions.builtin:net_connection

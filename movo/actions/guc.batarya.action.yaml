@@ -1,0 +1,18 @@
+id: guc.batarya
+name: Batarya yüzdesi
+summary: UPower'ın birleşik görüntü aygıtından batarya doluluğunu okur.
+category: sistem
+permissions: [dbus:org.freedesktop.UPower]
+tags: [güç, batarya, dbus]
+outputs:
+  percent: {type: number, label: Doluluk yüzdesi}
+impl:
+  kind: dbus
+  bus: system
+  service: org.freedesktop.UPower
+  object: /org/freedesktop/UPower/devices/DisplayDevice
+  interface: org.freedesktop.UPower.Device
+  property: Percentage
+  access: get
+  returns:
+    percent: {index: 0}

@@ -1,0 +1,16 @@
+name: Ekran görüntülerini tarihe göre arşivle
+description: Yeni ekran görüntüsünü ay klasörüne taşır ve adını düzenler.
+slug: ekran-arsiv
+
+trigger:
+  type: folder
+  path: ~/Resimler/Ekran Görüntüleri
+  match: "*.png"
+
+steps:
+  - id: arsivle
+    action: file.move
+    with:
+      file: "{{ trigger.file }}"
+      to_dir: ~/Resimler/Arşiv
+      pattern: "{date}-{time}-ekran.{ext}"

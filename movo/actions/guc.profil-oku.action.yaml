@@ -1,0 +1,18 @@
+id: guc.profil-oku
+name: Güç profilini oku
+summary: Etkin güç profilini metin olarak döndürür.
+category: sistem
+permissions: [dbus:net.hadess.PowerProfiles]
+tags: [güç, dbus]
+outputs:
+  profile: {type: text, label: Etkin profil}
+impl:
+  kind: dbus
+  bus: system
+  service: net.hadess.PowerProfiles
+  object: /net/hadess/PowerProfiles
+  interface: net.hadess.PowerProfiles
+  property: ActiveProfile
+  access: get
+  returns:
+    profile: {index: 0}

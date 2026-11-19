@@ -1,0 +1,13 @@
+id: file.rename
+name: Dosyayı yeniden adlandır
+summary: Dosyayı yerinde, desene göre yeniden adlandırır.
+category: dosya
+permissions: [fs.read, fs.write]
+inputs:
+  file: {type: file, label: Dosya, required: true}
+  pattern: {type: text, label: Ad deseni, required: true}
+outputs:
+  file: {type: file, label: Yeni yol}
+impl:
+  kind: python
+  entry: movo.actions.builtin:file_rename
